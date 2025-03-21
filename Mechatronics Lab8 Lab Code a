@@ -14,16 +14,27 @@
 // Functions //
 void initialize_usart(void); // function to set up USART
 void transmit_data_usart(int); // function to transmit a byte by USART
-void wait(volatile int multiple); // wait function
+void wait(int msec); // wait function
+void delayNms_timer0(); 
+
+// Global Variable
+char data = 0;
 
 
 int main(void)
 {		
+	// Pin Setup
+	DDRD = 1<<PD6;
+	OCR0A = 0x00;
+	TCCR0A = 0b11000011;
+	TCCR0B = 0b00000001;
+	
+	
 	// Initialize USART for communication
 	initialize_usart();
 		
 	// Enable reception
-	UCSR0B |= (1<<RXEN0);
+	// UCSR0B |= (1<<RXEN0);
 		
 	while (1) 
 	{
@@ -34,8 +45,9 @@ int main(void)
 		transmit_data_usart(0xFE);
 			
 		// µC1 receives a value from µC2
-		while (!(UCSR0A & (1<<RXC0))); // Wait for reception complete
-		int received_data0 = UDR0;       // Read received data
+		while (!(UCSR0A & 0b10000000)); // Wait for reception complete
+		data = UDR0;       // Read received data
+		OCR0A = data;
 			
 		// Wait 3 seconds
 		wait(3000);
@@ -44,8 +56,9 @@ int main(void)
 		transmit_data_usart(0xFF);
 			
 		// µC1 receives a value from µC2
-		while (!(UCSR0A & (1<<RXC0))); // Wait for reception complete
-		int received_data1 = UDR0;          // Read received data
+		while (!(UCSR0A & 0b10000000)); // Wait for reception complete
+		data = UDR0;       // Read received data
+		OCR0A = data;
 			
 		// Wait 3 seconds
 		wait(3000);
@@ -54,8 +67,9 @@ int main(void)
 		transmit_data_usart(0x55);
 			
 		// µC1 receives a value from µC2
-		while (!(UCSR0A & (1<<RXC0))); // Wait for reception complete
-		int received_data2 = UDR0;          // Read received data
+		while (!(UCSR0A & 0b10000000)); // Wait for reception complete
+		data = UDR0;       // Read received data
+		OCR0A = data;
 	}
 	return 0;
 }
@@ -73,34 +87,35 @@ void transmit_data_usart(int data) // Function to transmit a character
 	UDR0 = data;
 }
 
-void wait(volatile int number_of_msec) {
-	// This subroutine creates a delay equal to number_of_msec*T, where T is 1 msec
-	// It changes depending on the frequency defined by FREQ_CLK
-	char register_B_setting;
-	char count_limit;
-	
-	// Some typical clock frequencies:
-	switch(FREQ_CLK) {
-		case 16000000:
-		register_B_setting = 0b00000011; // this will start the timer in Normal mode with prescaler of 64 (CS02 = 0, CS01 = CS00 = 1).
-		count_limit = 250; // For prescaler of 64, a count of 250 will require 1 msec
-		break;
-		case 8000000:
-		register_B_setting =  0b00000011; // this will start the timer in Normal mode with prescaler of 64 (CS02 = 0, CS01 = CS00 = 1).
-		count_limit = 125; // for prescaler of 64, a count of 125 will require 1 msec
-		break;
-		case 1000000:
-		register_B_setting = 0b00000010; // this will start the timer in Normal mode with prescaler of 8 (CS02 = 0, CS01 = 1, CS00 = 0).
-		count_limit = 125; // for prescaler of 8, a count of 125 will require 1 msec
-		break;
+void wait(int msec)
+{
+	// This subroutine calls others to create a delay
+	// function passes number of msec to delay
+	while (msec > 0) {
+		delayNms_timer0();
+		msec = msec - 1;
 	}
-	
-	while (number_of_msec > 0) {
-		TCCR1A = 0x00; // clears WGM00 and WGM01 (bits 0 and 1) to ensure Timer/Counter is in normal mode.
-		TCNT1 = 0;  // preload value for testing on count = 250
-		TCCR1B =  register_B_setting;  // Start TIMER0 with the settings defined above
-		while (TCNT1 < count_limit); // exits when count = the required limit for a 1 msec delay
-		TCCR1B = 0x00; // Stop TIMER0
-		number_of_msec--;
-	}
-} // end wait()
+} // end wait
+
+void delayNms_timer0()
+{
+	// This subroutine creates a delay of N msec using TIMER0 with prescaler on clock, where, for a 16MHz clock:
+	//		N = .0156 msec for no prescaler and count of 250 (preload counter with 5)
+	//		N = 0.125 msec for prescaler set to 8 and count of 250 (preload counter with 5)
+	//		N = 1 msec for prescaler set to 64 and count of 250 (preload counter with 5)
+	//		N = 4 msec for prescaler set to 256 and count of 250 (preload counter with 5)
+	//		N = 16 msec for prescaler set to 1,024 and count of 250 (preload counter with 5)
+
+	TCCR1A = 0x00; // clears WGM00 and WGM01 (bits 0 and 1) to ensure Timer/Counter is in normal mode.
+	TCNT1 = 5;  // load timer0 with number for delay (count must reach 255-5)
+	//TCCR0B = 0x01; // Start Timer0, Normal mode, crystal clock, no prescaler
+	// TCCR0B = 0x02; // Start Timer0, Normal mode, crystal clock, prescaler = 8
+	TCCR1B =  0x03;  // Start Timer0, Normal mode, crystal clock, prescaler = 64
+	//TCCR0B = 0x04; // Start Timer0, Normal mode, crystal clock, prescaler = 256
+	//TCCR0B = 0x05; // Start Timer0, Normal mode, crystal clock, prescaler = 1024
+
+	while ((TIFR1 & (0x1<<TOV1)) == 0); // wait for TOV0 to roll over:
+
+	TCCR1B = 0x00; // Stop Timer0
+	TIFR1 = 0x1<<TOV1;  // Clear TOV0 (note that this is an odd bit in that it is cleared by writing a 1 to it)
+}
