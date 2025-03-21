@@ -13,7 +13,7 @@
 
 // Functions //
 void initialize_usart(void); // function to set up USART
-void transmit_data_usart(int); // function to transmit a byte by USART
+void transmit_data_usart(char); // function to transmit a byte by USART
 void wait(int msec); // wait function
 void delayNms_timer0(); 
 
@@ -81,7 +81,7 @@ void initialize_usart(void) // function to set up USART
 	UBRR0L = 0x33; // 9,600 baud if Fosc = 16MHz
 }
 
-void transmit_data_usart(int data) // Function to transmit a character
+void transmit_data_usart(char data) // Function to transmit a character
 {
 	while (!(UCSR0A & (1<<UDRE0))); // Poll to make sure transmit buffer is ready, 				// then send data
 	UDR0 = data;
