@@ -27,9 +27,15 @@ int main(void)
 	
 	wait(1000); // Wait for 1 second
 	
-	// Sending First Value 
+	// Sending First Value -- Primary
 	initialize_usart(); // Initialize the USART with desired parameters
-	transmit_data_usart(0xFF); // Transmit desired character – which is 0xFF
+	transmit_data_usart(0xFE); // Transmit desired character, 0xFE
+	
+	// Receiving First Value -- Secondary
+	initialize_usart();  // Initialize the USART with desired parameters
+	
+	while (!(UCSR0A & 0b10000000)); // ((! (UCSR0A & (1<<RXC0)));  // Wait until new data arrives
+	data =  UDR0; // read the data
 	
 	
 	
