@@ -23,11 +23,13 @@ char data = 0;
 
 int main(void)
 {		
-	// Pin Setup
-	DDRD = 1<<PD6;
-	OCR0A = 0x00;
-	TCCR0A = 0b11000011;
-	TCCR0B = 0b00000001;
+		DDRD = 1<<PD6; // Make OC0A (PD6) and OC0B (PD5) output bits -- these are the PWM pins;
+	
+		OCR0A = 0x00;       // Load $00 into OCR0 to set initial duty cycle to 0 (motor off)
+		TCCR0A = 0b11000011; //1<<COM0A1 | 0<<COM0A0 | 1<<WGM01 | 1<<WGM00;      // Set non-inverting mode on OC0A pin (COMA1:0 = 10; Fast PWM (WGM1:0 bits = bits 1:0 = 11) (Note that we are not affecting OC0B because COMB0:1 bits stay at default = 00)
+		TCCR0B = 0b00000001; //0<<CS02 | 1<<CS01 | 1<<CS00; // Set base PWM frequency (CS02:0 - bits 2-0 = 011 for prescaler of 64, for approximately 1kHz base frequency)
+		// PWM is now running on selected pin at selected base frequency.  Duty cycle is set by loading/changing value in OCR0A register.
+
 	
 	
 	// Initialize USART for communication
@@ -108,9 +110,9 @@ void delayNms_timer0()
 
 	TCCR1A = 0x00; // clears WGM00 and WGM01 (bits 0 and 1) to ensure Timer/Counter is in normal mode.
 	TCNT1 = 5;  // load timer0 with number for delay (count must reach 255-5)
-	//TCCR0B = 0x01; // Start Timer0, Normal mode, crystal clock, no prescaler
+	TCCR1B = 0x01; // Start Timer0, Normal mode, crystal clock, no prescaler
 	// TCCR0B = 0x02; // Start Timer0, Normal mode, crystal clock, prescaler = 8
-	TCCR1B =  0x03;  // Start Timer0, Normal mode, crystal clock, prescaler = 64
+	//TCCR1B =  0x03;  // Start Timer0, Normal mode, crystal clock, prescaler = 64
 	//TCCR0B = 0x04; // Start Timer0, Normal mode, crystal clock, prescaler = 256
 	//TCCR0B = 0x05; // Start Timer0, Normal mode, crystal clock, prescaler = 1024
 
