@@ -24,6 +24,7 @@ char data = 0;
 int main(void)
 {
 	// Pin Setup
+	DDRB = 0b11111111;
 	DDRD = 1<<PD6;
 	OCR0A = 0x00;
 	TCCR0A = 0b11000011;
