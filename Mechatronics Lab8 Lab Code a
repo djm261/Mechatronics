@@ -35,7 +35,7 @@ int main(void)
 			
 		// µC1 receives a value from µC2
 		while (!(UCSR0A & (1<<RXC0))); // Wait for reception complete
-		int received_data = UDR0;       // Read received data
+		int received_data0 = UDR0;       // Read received data
 			
 		// Wait 3 seconds
 		wait(3000);
@@ -45,7 +45,7 @@ int main(void)
 			
 		// µC1 receives a value from µC2
 		while (!(UCSR0A & (1<<RXC0))); // Wait for reception complete
-		received_data = UDR0;          // Read received data
+		int received_data1 = UDR0;          // Read received data
 			
 		// Wait 3 seconds
 		wait(3000);
@@ -55,7 +55,7 @@ int main(void)
 			
 		// µC1 receives a value from µC2
 		while (!(UCSR0A & (1<<RXC0))); // Wait for reception complete
-		received_data = UDR0;          // Read received data
+		int received_data2 = UDR0;          // Read received data
 	}
 	return 0;
 }
@@ -96,11 +96,11 @@ void wait(volatile int number_of_msec) {
 	}
 	
 	while (number_of_msec > 0) {
-		TCCR0A = 0x00; // clears WGM00 and WGM01 (bits 0 and 1) to ensure Timer/Counter is in normal mode.
-		TCNT0 = 0;  // preload value for testing on count = 250
-		TCCR0B =  register_B_setting;  // Start TIMER0 with the settings defined above
-		while (TCNT0 < count_limit); // exits when count = the required limit for a 1 msec delay
-		TCCR0B = 0x00; // Stop TIMER0
+		TCCR1A = 0x00; // clears WGM00 and WGM01 (bits 0 and 1) to ensure Timer/Counter is in normal mode.
+		TCNT1 = 0;  // preload value for testing on count = 250
+		TCCR1B =  register_B_setting;  // Start TIMER0 with the settings defined above
+		while (TCNT1 < count_limit); // exits when count = the required limit for a 1 msec delay
+		TCCR1B = 0x00; // Stop TIMER0
 		number_of_msec--;
 	}
 } // end wait()
