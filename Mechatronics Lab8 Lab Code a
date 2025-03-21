@@ -21,27 +21,51 @@ void wait(volatile int multiple); // wait function
 
 int main(void)
 {
-	// Setup //
-	DDRD = 0b01000000; // Setting pin 6 in PORT D as output pin
-	int data; // variable with which to receive incoming data
-	
-	wait(1000); // Wait for 1 second
-	
-	// Sending First Value -- Primary
-	initialize_usart(); // Initialize the USART with desired parameters
-	transmit_data_usart(0xFE); // Transmit desired character, 0xFE
-	
-	// Receiving First Value -- Secondary
-	initialize_usart();  // Initialize the USART with desired parameters
-	
-	while (!(UCSR0A & 0b10000000)); // ((! (UCSR0A & (1<<RXC0)));  // Wait until new data arrives
-	data =  UDR0; // read the data
-	
-	
-	
-	
-	
-	
+	int main(void)
+	{		
+		// Setting up LEDs
+		DDRD = 
+		
+		// Initialize USART for communication
+		initialize_usart();
+		
+		// Enable reception
+		UCSR0B |= (1<<RXEN0);
+		
+		while (1) 
+		{
+			// Wait 1 second
+			wait(1000);
+			
+			// µC1 sends 0xFE to µC2
+			transmit_data_usart(0xFE);
+			
+			// µC1 receives a value from µC2
+			while (!(UCSR0A & (1<<RXC0))); // Wait for reception complete
+			int received_data = UDR0;       // Read received data
+			
+			// Wait 3 seconds
+			wait(3000);
+			
+			// µC1 sends 0xFF to µC2
+			transmit_data_usart(0xFF);
+			
+			// µC1 receives a value from µC2
+			while (!(UCSR0A & (1<<RXC0))); // Wait for reception complete
+			received_data = UDR0;          // Read received data
+			
+			// Wait 3 seconds
+			wait(3000);
+			
+			// µC1 sends 0x55 to µC2
+			transmit_data_usart(0x55);
+			
+			// µC1 receives a value from µC2
+			while (!(UCSR0A & (1<<RXC0))); // Wait for reception complete
+			received_data = UDR0;          // Read received data
+		}
+		return 0;
+	}
 }
 
 void initialize_usart(void) // function to set up USART
