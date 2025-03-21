@@ -17,55 +17,47 @@ void transmit_data_usart(int); // function to transmit a byte by USART
 void wait(volatile int multiple); // wait function
 
 
-
-
 int main(void)
-{
-	int main(void)
-	{		
-		// Setting up LEDs
-		DDRD = 
+{		
+	// Initialize USART for communication
+	initialize_usart();
 		
-		// Initialize USART for communication
-		initialize_usart();
+	// Enable reception
+	UCSR0B |= (1<<RXEN0);
 		
-		// Enable reception
-		UCSR0B |= (1<<RXEN0);
-		
-		while (1) 
-		{
-			// Wait 1 second
-			wait(1000);
+	while (1) 
+	{
+		// Wait 1 second
+		wait(1000);
 			
-			// µC1 sends 0xFE to µC2
-			transmit_data_usart(0xFE);
+		// µC1 sends 0xFE to µC2
+		transmit_data_usart(0xFE);
 			
-			// µC1 receives a value from µC2
-			while (!(UCSR0A & (1<<RXC0))); // Wait for reception complete
-			int received_data = UDR0;       // Read received data
+		// µC1 receives a value from µC2
+		while (!(UCSR0A & (1<<RXC0))); // Wait for reception complete
+		int received_data = UDR0;       // Read received data
 			
-			// Wait 3 seconds
-			wait(3000);
+		// Wait 3 seconds
+		wait(3000);
 			
-			// µC1 sends 0xFF to µC2
-			transmit_data_usart(0xFF);
+		// µC1 sends 0xFF to µC2
+		transmit_data_usart(0xFF);
 			
-			// µC1 receives a value from µC2
-			while (!(UCSR0A & (1<<RXC0))); // Wait for reception complete
-			received_data = UDR0;          // Read received data
+		// µC1 receives a value from µC2
+		while (!(UCSR0A & (1<<RXC0))); // Wait for reception complete
+		received_data = UDR0;          // Read received data
 			
-			// Wait 3 seconds
-			wait(3000);
+		// Wait 3 seconds
+		wait(3000);
 			
-			// µC1 sends 0x55 to µC2
-			transmit_data_usart(0x55);
+		// µC1 sends 0x55 to µC2
+		transmit_data_usart(0x55);
 			
-			// µC1 receives a value from µC2
-			while (!(UCSR0A & (1<<RXC0))); // Wait for reception complete
-			received_data = UDR0;          // Read received data
-		}
-		return 0;
+		// µC1 receives a value from µC2
+		while (!(UCSR0A & (1<<RXC0))); // Wait for reception complete
+		received_data = UDR0;          // Read received data
 	}
+	return 0;
 }
 
 void initialize_usart(void) // function to set up USART
