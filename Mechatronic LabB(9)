@@ -1,0 +1,103 @@
+/*
+ * Mechatronics_LabB(9)_LabCode0.cpp
+ *
+ * Created: 4/2/2025 2:47:28 PM
+ * Author : djm261
+ */ 
+
+// Libraries //
+#include <avr/io.h>
+#define FREQ_CLK 1000000 // Clock frequency (default setting for the ATmega328P -- 8 MHz internal clock with divide-by-8
+
+// Functions //
+void send_to_MAX7221(unsigned char command, unsigned char data);
+void wait(volatile int multiple);
+
+
+int main(void)
+{
+    DDRB = 0b00101100;
+	
+	SPCR = 0b01010001;
+	
+	// Transmit the data
+	
+	// Decode
+	send_to_MAX7221(0b00001001, 0b11111111);
+	
+	// Scan limit
+	send_to_MAX7221(0b00001011, 0b00000010);
+	
+	// Turn on display
+	send_to_MAX7221(0b00001100, 0b00000001);
+	
+	while(1)
+	{
+		// Decode again
+		send_to_MAX7221(0b00001001, 0b11111111);
+		
+		// Set month
+		send_to_MAX7221(0b00000001, 0b00000100); // Dig0 to 4
+		send_to_MAX7221(0b00000010, 0b00000000); // Dig1 to 0
+		wait(1000); // Wait 1 second
+		
+		// Decode again
+		send_to_MAX7221(0b00001001, 0b11111111);
+		
+		// Set day
+		send_to_MAX7221(0b00000001, 0b00000010); // Dig0 to 2
+		send_to_MAX7221(0b00000010, 0b00000000); // Dig1 to 0
+		wait(1000); // Wait 1 second
+		
+		// Blank display
+		send_to_MAX7221(0b00000001, 0b00001111); // Dig0 to blank
+		send_to_MAX7221(0b00000010, 0b00001111); // Dig1 to blank
+		wait(2000); // Wait 2 seconds
+	}
+}
+
+int send_to_MAX7221(unsigned char command, unsigned char data)
+{
+	PORTB = PORTB & 0b11111011; // Clear PB2, which is the SS bit, so that transmission can begin
+	SPDR = command; // Send command
+	while(!(SPSR & (1<<SPIF))); // Wait for transmission to finish
+	
+	SPDR = data; // Send data
+	while(!(SPSR & (1<<SPIF))); // Wait for transmission to finish
+	
+	PORTB = PORTB | 0b00000100; // Return PB2 to 1, which is the SS bit, to end transmission
+	return 0;
+}
+
+
+void wait(volatile int number_of_msec) {
+	// This subroutine creates a delay equal to number_of_msec*T, where T is 1 msec
+	// It changes depending on the frequency defined by FREQ_CLK
+	char register_B_setting;
+	char count_limit;
+	
+	// Some typical clock frequencies:
+	switch(FREQ_CLK) {
+		case 16000000:
+		register_B_setting = 0b00000011; // this will start the timer in Normal mode with prescaler of 64 (CS02 = 0, CS01 = CS00 = 1).
+		count_limit = 250; // For prescaler of 64, a count of 250 will require 1 msec
+		break;
+		case 8000000:
+		register_B_setting =  0b00000011; // this will start the timer in Normal mode with prescaler of 64 (CS02 = 0, CS01 = CS00 = 1).
+		count_limit = 125; // for prescaler of 64, a count of 125 will require 1 msec
+		break;
+		case 1000000:
+		register_B_setting = 0b00000010; // this will start the timer in Normal mode with prescaler of 8 (CS02 = 0, CS01 = 1, CS00 = 0).
+		count_limit = 125; // for prescaler of 8, a count of 125 will require 1 msec
+		break;
+	}
+	
+	while (number_of_msec > 0) {
+		TCCR0A = 0x00; // clears WGM00 and WGM01 (bits 0 and 1) to ensure Timer/Counter is in normal mode.
+		TCNT0 = 0;  // preload value for testing on count = 250
+		TCCR0B =  register_B_setting;  // Start TIMER0 with the settings defined above
+		while (TCNT0 < count_limit); // exits when count = the required limit for a 1 msec delay
+		TCCR0B = 0x00; // Stop TIMER0
+		number_of_msec--;
+	}
+} // end wait()
