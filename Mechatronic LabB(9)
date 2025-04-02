@@ -39,7 +39,7 @@ int main(void)
 		// Set month
 		send_to_MAX7221(0b00000001, 0b00000100); // Dig0 to 4
 		send_to_MAX7221(0b00000010, 0b00000000); // Dig1 to 0
-		wait(1000); // Wait 1 second
+		wait(10000); // Wait 1 second
 		
 		// Decode again
 		send_to_MAX7221(0b00001001, 0b11111111);
@@ -47,16 +47,16 @@ int main(void)
 		// Set day
 		send_to_MAX7221(0b00000001, 0b00000010); // Dig0 to 2
 		send_to_MAX7221(0b00000010, 0b00000000); // Dig1 to 0
-		wait(1000); // Wait 1 second
+		wait(10000); // Wait 1 second
 		
 		// Blank display
 		send_to_MAX7221(0b00000001, 0b00001111); // Dig0 to blank
 		send_to_MAX7221(0b00000010, 0b00001111); // Dig1 to blank
-		wait(2000); // Wait 2 seconds
+		wait(20000); // Wait 2 seconds
 	}
 }
 
-int send_to_MAX7221(unsigned char command, unsigned char data)
+void send_to_MAX7221(unsigned char command, unsigned char data)
 {
 	PORTB = PORTB & 0b11111011; // Clear PB2, which is the SS bit, so that transmission can begin
 	SPDR = command; // Send command
@@ -66,7 +66,6 @@ int send_to_MAX7221(unsigned char command, unsigned char data)
 	while(!(SPSR & (1<<SPIF))); // Wait for transmission to finish
 	
 	PORTB = PORTB | 0b00000100; // Return PB2 to 1, which is the SS bit, to end transmission
-	return 0;
 }
 
 
