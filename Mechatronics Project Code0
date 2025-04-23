@@ -21,7 +21,7 @@ int main(void)
 	{
 		if(!(PINC & 0b00000001)) // 4 Player count dealing is activated if pin 0 in Port C is set as low (Switch is pressed)
 		{
-			for(int j = 0; j <= 11; j++)
+			for(int j = 0; j <= 49; j++)
 			{
 				PORTB = 0b00000010;
 				step_CW();
@@ -29,7 +29,7 @@ int main(void)
 			}
 			wait(2000,1); // Pause 2 seconds for card dealing
 		
-			for(int i = 0; i <= 11; i++)
+			for(int i = 0; i <= 49; i++)
 			{
 				PORTB = 0b00000001;
 				step_CW();
@@ -37,7 +37,7 @@ int main(void)
 			}
 			wait(2000,1); // Pause 2 seconds for card dealing
 		
-			for(int k = 0; k <= 11; k++)
+			for(int k = 0; k <= 49; k++)
 			{
 				PORTB = 0b00000001;
 				step_CW();
@@ -45,7 +45,7 @@ int main(void)
 			}
 			wait(2000,1); // Pause 2 seconds for card dealing
 			
-			for(int k = 0; k <= 11; k++)
+			for(int k = 0; k <= 49; k++)
 			{
 				PORTB = 0b00000001;
 				step_CW();
@@ -112,7 +112,7 @@ int main(void)
 
 		if(!(PINC & 0b00000100)) // 8 Player count dealing is activated if pin 2 in Port C is set as low (Switch is pressed)
 		{
-			for(int x = 0; x <= 5; x++)
+			for(int x = 0; x <= 24; x++)
 			{
 				PORTB = 0b00000010;
 				step_CW();
@@ -121,7 +121,7 @@ int main(void)
 			
 			wait(2000,1); // Pause 2 seconds for card dealing
 			
-			for(int y = 0; y <= 5; y++)
+			for(int y = 0; y <= 24; y++)
 			{
 				PORTB = 0b00000010;
 				step_CW();
@@ -130,7 +130,7 @@ int main(void)
 			
 			wait(2000,1); // Pause 2 seconds for card dealing
 			
-			for(int z = 0; z <= 5; z++)
+			for(int z = 0; z <= 24; z++)
 			{
 				PORTB = 0b00000010;
 				step_CW();
@@ -139,7 +139,7 @@ int main(void)
 			
 			wait(2000,1); // Pause 2 seconds for card dealing
 			
-			for(int w = 0; w <= 5; w++)
+			for(int w = 0; w <= 24; w++)
 			{
 				PORTB = 0b00000010;
 				step_CW();
@@ -148,7 +148,7 @@ int main(void)
 			
 			wait(2000,1); // Pause 2 seconds for card dealing
 			
-			for(int t = 0; t <= 5; t++)
+			for(int t = 0; t <= 24; t++)
 			{
 				PORTB = 0b00000010;
 				step_CW();
@@ -157,7 +157,7 @@ int main(void)
 			
 			wait(2000,1); // Pause 2 seconds for card dealing
 			
-			for(int p = 0; p <= 5; p++)
+			for(int p = 0; p <= 24; p++)
 			{
 				PORTB = 0b00000010;
 				step_CW();
@@ -166,7 +166,7 @@ int main(void)
 			
 			wait(2000,1); // Pause 2 seconds for card dealing
 			
-			for(int h = 0; h <= 5; h++)
+			for(int h = 0; h <= 24; h++)
 			{
 				PORTB = 0b00000010;
 				step_CW();
@@ -175,7 +175,7 @@ int main(void)
 			
 			wait(2000,1); // Pause 2 seconds for card dealing
 			
-			for(int l = 0; l <= 5; l++)
+			for(int l = 0; l <= 24; l++)
 			{
 				PORTB = 0b00000010;
 				step_CW();
