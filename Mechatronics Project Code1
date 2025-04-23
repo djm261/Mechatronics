@@ -1,3 +1,17 @@
+//**Libraries**//
+#include <avr/io.h>
+
+//**Functions**//
+void step_CW0( void );
+void step_CW1( void );
+void wait(volatile int multiple, volatile char time_choice);
+void delay_T_msec_timer0(char choice);
+
+//** GLOBAL VARIABLES **
+int phase_step0 = 1; // We will use wave stepping, so the steps are numbered 1-4, then will repeat. | Stepper rotating base
+int phase_step1 = 1; // We will use wave stepping, so the steps are numbered 1-4, then will repeat. | Stepper dealing cards
+int fourplayer = 0; // For while loop for player count 4
+
 int main(void)
 {
 	DDRC = 0b00011000; // Setting pin 0, 1, 2 as input for switch | Setting pin 3, 4 as output for LEDs | PORT C
@@ -6,7 +20,7 @@ int main(void)
 	
 	while(1)
 	{
-		while(int a = 0; a <= 3)
+		while(int fourplayer = 0; fourplayer <= 3)
 		{
 			if(!(PINC & 0b00000001)) // 4 Player count dealing is activated if pin 0 in Port C is set as low (Switch is pressed)
 			{
@@ -23,7 +37,8 @@ int main(void)
 					step_CW1();
 					wait(55,1);
 				}
-				a++;
+				fourplayer++;
 			}
 		}
+	}
 }
